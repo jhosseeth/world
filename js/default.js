@@ -56,7 +56,8 @@ manager.onProgress =  (url, itemsLoaded, itemsTotal) => {
 };
 
 manager.onLoad = function () {
-	document.getElementById("loader").style.visibility = "hidden";
+	document.getElementById("loader").style.visibility = "hidden"; // hide loader animation
+	document.getElementById("overCanvas").style.display  = "block"; // show button to orbit model
 };
 
 
@@ -80,8 +81,28 @@ loader.load(
 /* ===========================================================================
 ** 								ORBIT CONTROL
 ** =========================================================================== */
+const btn = document.getElementById("toOrbit");
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.update();
+controls.enabled = false; // the controls will not respond to user input
+
+// Add event to orbit around the model
+btn.addEventListener('click', event => {
+	controls.enabled = controls.enabled ? false : true;
+	renderer.domElement.className =  controls.enabled ? "grab" : "";
+	document.getElementsByClassName("text")[0].innerHTML = controls.enabled ? "Click to stop orbiting" : "Click to orbit"; 
+});
+
+// Add grabbing cursor style when an interaction was initiated. 
+controls.addEventListener('start', event => {
+	renderer.domElement.className = "grabbing";
+});
+
+// Add grab cursor style when an interaction has finished.
+controls.addEventListener('end', event => {
+	renderer.domElement.className = "grab";
+});
+
 
 
 /** Create a loop that causes the renderer to draw the scene every time the screen is refreshed
