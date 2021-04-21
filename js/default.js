@@ -6,6 +6,7 @@ console.log("ThreeJS funciona: ", THREE);
 console.log("GLTFLoader funciona: ", GLTFLoader);
 console.log("OrbitControls funciona: ", OrbitControls);
 
+
 /* ===========================================================================
 ** 					 				SCENE
 ** =========================================================================== */
@@ -32,8 +33,8 @@ camera.position.z = (window.innerWidth < 600) ? 7 : 4; // Responsive
 ** 				  				   RENDERER
 ** =========================================================================== */
 const renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild(renderer.domElement);
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement); // Show canvas
 
 // Responsive
 window.addEventListener('resize', () => {
@@ -45,9 +46,24 @@ window.addEventListener('resize', () => {
 
 
 /* ===========================================================================
+** 								   LOADER
+** =========================================================================== */
+const manager = new THREE.LoadingManager(); //Handles and keeps track of loaded and pending data
+
+manager.onProgress =  (url, itemsLoaded, itemsTotal) => {
+	let percLoaded = parseInt((itemsLoaded / itemsTotal) * 100);
+	document.getElementById("loadingTxt").innerHTML = `LOADING ${percLoaded}%`;
+};
+
+manager.onLoad = function () {
+	document.getElementById("loader").style.visibility = "hidden";
+};
+
+
+/* ===========================================================================
 ** 									MODEL
 ** =========================================================================== */
-const loader = new GLTFLoader();
+const loader = new GLTFLoader(manager);
 var text, earth;
 
 loader.load(
@@ -74,11 +90,10 @@ controls.update();
 const animate = time => {
 	if (text) text.rotation.z += 0.001;
 	if (earth) earth.rotation.y += 0.001;
-	
+
 	renderer.render(scene, camera);
 	requestAnimationFrame(animate); // Animate loop
 }
 
 requestAnimationFrame(animate);
 
-console.log("prueba");
