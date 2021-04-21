@@ -6,29 +6,41 @@ console.log("ThreeJS funciona: ", THREE);
 console.log("GLTFLoader funciona: ", GLTFLoader);
 console.log("OrbitControls funciona: ", OrbitControls);
 
+/* ===========================================================================
+** 					 				SCENE
+** =========================================================================== */
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-camera.position.z = 4;
-
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild( renderer.domElement );
-
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.update();
-
-const loader = new GLTFLoader();
-
-loader.load(
-	'model/world.gltf',
-	gltf => {
-		scene.add(gltf.scene);
-	}
-);
+scene.background = new THREE.Color("black");
 
 // Create a light
 const light = new THREE.AmbientLight("white"); // soft white light
-scene.add( light );
+scene.add(light);
+
+
+/* ===========================================================================
+** 									CAMERA
+** =========================================================================== */
+const fov = 75;
+const aspect = window.innerWidth / window.innerHeight;
+const near = 0.1;
+const far = 1000;
+const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+camera.position.z = (window.innerWidth < 600) ? 7 : 4; // Responsive
+
+// Responsive
+window.addEventListener('resize', () => {
+	camera.position.z = (window.innerWidth < 600) ? 7 : 4;
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.updateProjectionMatrix();
+});
+
+/* ===========================================================================
+** 				  				   RENDERER
+** =========================================================================== */
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth, window.innerHeight );
+document.body.appendChild(renderer.domElement);
 
 
 /** Create a loop that causes the renderer to draw the scene every time the screen is refreshed
@@ -40,3 +52,22 @@ const animate = time => {
 }
 
 requestAnimationFrame(animate);
+
+
+/* ===========================================================================
+** 									MODEL
+** =========================================================================== */
+const loader = new GLTFLoader();
+loader.load(
+	'model/world.gltf',
+	gltf => {
+		scene.add(gltf.scene);
+	}
+);
+
+
+/* ===========================================================================
+** 								ORBIT CONTROL
+** =========================================================================== */
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.update();
