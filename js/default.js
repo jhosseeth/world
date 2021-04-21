@@ -27,13 +27,6 @@ const far = 1000;
 const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 camera.position.z = (window.innerWidth < 600) ? 7 : 4; // Responsive
 
-// Responsive
-window.addEventListener('resize', () => {
-	camera.position.z = (window.innerWidth < 600) ? 7 : 4;
-	renderer.setSize(window.innerWidth, window.innerHeight);
-	camera.aspect = window.innerWidth / window.innerHeight;
-	camera.updateProjectionMatrix();
-});
 
 /* ===========================================================================
 ** 				  				   RENDERER
@@ -42,26 +35,28 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild(renderer.domElement);
 
-
-/** Create a loop that causes the renderer to draw the scene every time the screen is refreshed
-* @param { number } time - A timestamp number returned by requestAnimationFrame()
-*/
-const animate = time => {
-	renderer.render(scene, camera);
-	requestAnimationFrame(animate); // Animate loop
-}
-
-requestAnimationFrame(animate);
+// Responsive
+window.addEventListener('resize', () => {
+	camera.position.z = (window.innerWidth < 600) ? 7 : 4;
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.updateProjectionMatrix();
+});
 
 
 /* ===========================================================================
 ** 									MODEL
 ** =========================================================================== */
 const loader = new GLTFLoader();
+var text, earth;
+
 loader.load(
 	'model/world.gltf',
 	gltf => {
-		scene.add(gltf.scene);
+		let model = gltf.scene;
+		scene.add(model);
+		text = model.getObjectByName('Text');
+		earth = model.getObjectByName('Earth');
 	}
 );
 
@@ -71,3 +66,19 @@ loader.load(
 ** =========================================================================== */
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.update();
+
+
+/** Create a loop that causes the renderer to draw the scene every time the screen is refreshed
+* @param { number } time - A timestamp number returned by requestAnimationFrame()
+*/
+const animate = time => {
+	if (text) text.rotation.z += 0.001;
+	if (earth) earth.rotation.y += 0.001;
+	
+	renderer.render(scene, camera);
+	requestAnimationFrame(animate); // Animate loop
+}
+
+requestAnimationFrame(animate);
+
+console.log("prueba");
